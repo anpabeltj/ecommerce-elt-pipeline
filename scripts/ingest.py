@@ -17,6 +17,7 @@ def get_db_engine():
     )
     return engine
 
+
 def load_csv_to_postgres(file_path, engine):
     df = pd.read_csv(file_path)
     file_name = os.path.basename(file_path).replace(".csv", "")
