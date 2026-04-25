@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS mart_revenue_by_month;
 CREATE TABLE mart_revenue_by_month AS SELECT
 DATE_TRUNC('month', od.order_purchase_timestamp::TIMESTAMP)::DATE AS date,
 ROUND(SUM(op.payment_value)::NUMERIC, 2) AS total_revenue
@@ -7,6 +8,7 @@ ON od.order_id = op.order_id
 GROUP BY date
 ORDER BY date ASC;
 
+DROP TABLE IF EXISTS mart_top_product_categories;
 CREATE TABLE mart_top_product_categories AS SELECT
 pc.product_category_name_english AS category_english,
 pc.product_category_name AS category_portuguese,
@@ -19,6 +21,7 @@ ON p.product_category_name = pc.product_category_name
 GROUP BY category_english, category_portuguese
 ORDER BY total_orders DESC;
 
+DROP TABLE IF EXISTS mart_seller_performance;
 CREATE TABLE mart_seller_performance AS SELECT
 s.seller_id,
 COUNT (oi.order_id) AS total_orders,
