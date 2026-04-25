@@ -163,12 +163,13 @@ Copy the example file and fill in your values:
 cp .env.example .env
 ```
 
-Open `.env` and set the following:
+Open `.env` and fill in your values based on `.env.example`:
 
 ```env
-DB_USER=olist_user
-DB_PASS=olist_pass
-DB_NAME=olist_db
+DB_USER=your_user_olist
+DB_PASS=your_olist_pass
+DB_NAME=your_olist_db
+# for airflow (running inside Docker)
 DB_HOST=postgres-olist
 DB_PORT=5432
 ```
@@ -196,25 +197,25 @@ This command starts four containers:
 
 ### 5️⃣ Access the services
 
-| Service            | URL                   | Credentials             |
-| ------------------ | --------------------- | ----------------------- |
-| Airflow UI         | http://localhost:8080 | admin / admin           |
-| Metabase           | http://localhost:3000 | set on first login      |
-| PostgreSQL (olist) | localhost:5435        | olist_user / olist_pass |
+| Service            | URL                   | Credentials           |
+| ------------------ | --------------------- | --------------------- |
+| Airflow UI         | http://localhost:8080 | admin / admin         |
+| Metabase           | http://localhost:3000 | set on first login    |
+| PostgreSQL (olist) | localhost:5435        | as set in your `.env` |
 
 ### 6️⃣ Configure the Airflow connection
 
 In the Airflow UI navigate to **Admin > Connections** and create a new connection:
 
-| Field           | Value            |
-| --------------- | ---------------- |
-| Connection ID   | `postgres_olist` |
-| Connection Type | `Postgres`       |
-| Host            | `postgres-olist` |
-| Schema          | `olist_db`       |
-| Login           | `olist_user`     |
-| Password        | `olist_pass`     |
-| Port            | `5432`           |
+| Field           | Value                             |
+| --------------- | --------------------------------- |
+| Connection ID   | `postgres_olist`                  |
+| Connection Type | `Postgres`                        |
+| Host            | `postgres-olist`                  |
+| Schema          | value of `DB_NAME` in your `.env` |
+| Login           | value of `DB_USER` in your `.env` |
+| Password        | value of `DB_PASS` in your `.env` |
+| Port            | `5432`                            |
 
 ### 7️⃣ Trigger the DAG
 
@@ -230,9 +231,9 @@ On first launch Metabase walks you through adding a database. Point it at:
 
 - **Host:** `postgres-olist`
 - **Port:** `5432`
-- **Database:** `olist_db`
-- **User:** `olist_user`
-- **Password:** `olist_pass`
+- **Database:** value of `DB_NAME` in your `.env`
+- **User:** value of `DB_USER` in your `.env`
+- **Password:** value of `DB_PASS` in your `.env`
 
 Then explore the three mart tables to build your dashboards 📈
 
