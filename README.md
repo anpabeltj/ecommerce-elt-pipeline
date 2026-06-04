@@ -1,6 +1,9 @@
 # 🛒 Olist E-Commerce ELT Pipeline
 
-An end-to-end **ELT (Extract, Load, Transform)** pipeline built on top of the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). Raw CSV files are ingested into PostgreSQL, transformed into analytics-ready mart tables, and visualised through Metabase — all orchestrated by Apache Airflow running in Docker.
+An end-to-end **ELT (Extract, Load, Transform)** pipeline built on top of the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). Raw CSV files are ingested into PostgreSQL, transformed into analytics-ready mart tables, and visualised through Metabase. All orchestrated by Apache Airflow running in Docker.
+
+<img width="981" height="316" alt="image" src="https://github.com/user-attachments/assets/e6e4c2e5-c34a-4bb9-8581-80427e858c6a" />
+
 
 ---
 
