@@ -7,20 +7,28 @@ services:
       POSTGRES_DB: airflow
     volumes:
       - postgres_airflow_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 5s
+      retries: 10
+
   postgres-olist:
     image: postgres:15
     environment:
-      POSTGRES_USER: olist_user
-      POSTGRES_PASSWORD: olist_pass
-      POSTGRES_DB: olist_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
     ports:
       - "5435:5432"
     volumes:
       - postgres_olist_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      retries: 10
+
   airflow:
     image: apache/airflow:2.8.1
-    env_file:
-      - .env
     command: >
       bash -c "airflow db migrate &&
                airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com ;
@@ -29,28 +37,62 @@ services:
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
       AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres-airflow/airflow
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
-      _PIP_ADDITIONAL_REQUIREMENTS: "requests pandas psycopg2-binary python-dotenv"
-      _AIRFLOW_WWW_USER_CREATE: "true"
-      _AIRFLOW_WWW_USER_USERNAME: admin
-      _AIRFLOW_WWW_USER_PASSWORD: admin
+      _PIP_ADDITIONAL_REQUIREMENTS: "pandas psycopg2-binary python-dotenv"
+      # Dipakai ingest.py
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: postgres-olist
+      DB_PORT: "5432"
+      DATA_DIR: /opt/airflow/data
+      # Connection untuk PostgresOperator, tidak perlu setup manual di UI
+      AIRFLOW_CONN_POSTGRES_OLIST: postgresql://${DB_USER}:${DB_PASS}@postgres-olist:5432/${DB_NAME}
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./scripts:/opt/airflow/scripts
       - ./data:/opt/airflow/data
-      - ./.env:/opt/airflow/.env
     ports:
       - "8080:8080"
     depends_on:
-      - postgres-airflow
+      postgres-airflow:
+        condition: service_healthy
+      postgres-olist:
+        condition: service_healthy
 
   metabase:
-    image: metabase/metabase:latest
+    image: metabase/metabase:v0.63.18.x
+    hostname: metabase
+    environment:
+      MB_DB_FILE: /metabase-data/metabase.db
+      # Instance id tetap untuk scheduler Quartz, supaya tidak bergantung pada lookup hostname
+      JAVA_OPTS: "-Dorg.quartz.scheduler.instanceId=metabase-olist"
+    volumes:
+      - metabase_data:/metabase-data
     ports:
       - "3000:3000"
     depends_on:
-      - postgres-airflow
+      postgres-olist:
+        condition: service_healthy
+
+  # Jalan sekali: buat admin Metabase dan hubungkan database olist
+  metabase-setup:
+    image: python:3.12-slim
+    command: python /scripts/metabase_setup.py
+    environment:
+      MB_URL: http://metabase:3000
+      MB_ADMIN_EMAIL: ${MB_ADMIN_EMAIL}
+      MB_ADMIN_PASSWORD: ${MB_ADMIN_PASSWORD}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+    volumes:
+      - ./scripts:/scripts:ro
+    depends_on:
+      - metabase
+    restart: "no"
 
 volumes:
   postgres_airflow_data:
   postgres_olist_data:
+  metabase_data:
