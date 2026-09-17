@@ -2,6 +2,8 @@
 
 An end-to-end **ELT (Extract, Load, Transform)** pipeline built on the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce). Raw CSV files are loaded into PostgreSQL, transformed into analytics-ready mart tables with SQL, validated by automated data quality checks, and served through a Metabase dashboard that is provisioned automatically. Everything is orchestrated by Apache Airflow and runs in Docker Compose.
 
+![Architecture](docs/architecture.png)
+
 ---
 
 ## ✨ Highlights
@@ -70,10 +72,10 @@ ecommerce-elt-pipeline/
 │   │   ├── monthly_revenue_matches_raw.sql
 │   │   ├── no_orders_lost_in_categories.sql
 │   │   └── review_score_in_range.sql
-│   └── metabase_questions/            # SQL behind each dashboard chart
-│       ├── 01_monthly_revenue_trend.sql
-│       ├── 02_top_10_categories.sql
-│       └── 03_late_delivery_vs_review.sql
+│   └── metabase_queries/              # SQL behind each dashboard chart
+│       ├── monthly_revenue_trend.sql
+│       ├── top_10_categories.sql
+│       └── late_delivery_vs_review.sql
 ├── data/                              # Olist CSV files (not committed)
 ├── docs/                              # Architecture and dashboard images
 ├── logs/                              # Airflow task logs (auto-generated)
@@ -151,7 +153,7 @@ On startup, `metabase-setup` calls the Metabase API to:
 
 1. Create the admin account, skipping the setup wizard
 2. Connect the `postgres-olist` database
-3. Create three saved questions from `scripts/metabase_questions/`
+3. Create three saved questions from `scripts/metabase_queries/`
 4. Arrange them in the **Olist E-Commerce Overview** dashboard under _Our analytics_
 
 Every step is skipped if it already exists, so the container is safe to rerun. Layout changes you make by hand in Metabase are not overwritten.

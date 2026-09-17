@@ -2,7 +2,7 @@
 Setup otomatis Metabase:
 1. Membuat akun admin (melewati setup wizard)
 2. Menambahkan database olist
-3. Membuat saved questions dari file SQL di scripts/metabase_questions/
+3. Membuat saved questions dari file SQL di scripts/metabase_queries/
 4. Menyusun ketiga question dalam satu dashboard
 
 Aman dijalankan berulang kali. Admin, database, question, atau dashboard yang sudah ada akan dilewati.
@@ -21,7 +21,7 @@ ADMIN_PASSWORD = os.environ["MB_ADMIN_PASSWORD"]
 DATABASE_NAME = "Olist"
 DASHBOARD_NAME = "Olist E-Commerce Overview"
 DASHBOARD_DESCRIPTION = "Tren revenue, kategori terlaris, dan dampak keterlambatan pengiriman terhadap review."
-QUESTIONS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "metabase_questions")
+QUESTIONS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "metabase_queries")
 
 # Daftar question yang dibuat di "Our analytics".
 # display: jenis chart Metabase (line, bar, row, table, dll)
